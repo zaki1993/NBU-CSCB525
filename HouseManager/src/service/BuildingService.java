@@ -16,7 +16,7 @@ public class BuildingService {
         try {
             // Update the call to match the new constructor with the 'sharedArea' parameter
             buildingDAO.createBuilding(address, floors, apartments, totalArea, sharedArea);
-            System.out.println("pojo.Building added successfully!");
+            System.out.println("Building added successfully!");
         } catch (SQLException e) {
             System.err.println("Error adding building: " + e.getMessage());
         }
@@ -26,7 +26,7 @@ public class BuildingService {
         try {
             // Update the call to match the new constructor with the 'sharedArea' parameter
             buildingDAO.updateBuilding(id, address, floors, apartments, totalArea, sharedArea);
-            System.out.println("pojo.Building updated successfully!");
+            System.out.println("Building updated successfully!");
         } catch (SQLException e) {
             System.err.println("Error updating building: " + e.getMessage());
         }
@@ -35,7 +35,7 @@ public class BuildingService {
     public void deleteBuilding(int id) {
         try {
             buildingDAO.deleteBuilding(id);
-            System.out.println("pojo.Building deleted successfully!");
+            System.out.println("Building deleted successfully!");
         } catch (SQLException e) {
             System.err.println("Error deleting building: " + e.getMessage());
         }

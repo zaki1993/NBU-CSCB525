@@ -14,7 +14,7 @@ public class CompanyDAO {
     }
 
     public void createCompany(String name, String address, String phone) throws SQLException {
-        String query = "INSERT INTO pojo.Company (name, address, phone) VALUES (?, ?, ?)";
+        String query = "INSERT INTO companies (name, address, phone) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, name);
             stmt.setString(2, address);
@@ -24,7 +24,7 @@ public class CompanyDAO {
     }
 
     public void updateCompany(int id, String name, String address, String phone) throws SQLException {
-        String query = "UPDATE pojo.Company SET name = ?, address = ?, phone = ? WHERE id = ?";
+        String query = "UPDATE companies SET name = ?, address = ?, phone = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, name);
             stmt.setString(2, address);
@@ -35,15 +35,18 @@ public class CompanyDAO {
     }
 
     public void deleteCompany(int id) throws SQLException {
-        String query = "DELETE FROM pojo.Company WHERE id = ?";
+        String query = "DELETE FROM companies WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
-            stmt.executeUpdate();
+            int rowsDeleted = stmt.executeUpdate();
+            if (rowsDeleted <= 0) {
+                throw new SQLException("No employee found with the given ID.");
+            }
         }
     }
 
     public List<Company> getAllCompanies() throws SQLException {
-        String query = "SELECT * FROM pojo.Company";
+        String query = "SELECT * FROM companies";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 

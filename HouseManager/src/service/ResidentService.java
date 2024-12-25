@@ -16,7 +16,7 @@ public class ResidentService {
     public void addResident(String name, int age, boolean usesElevator, boolean hasPet, int apartmentId) {
         try {
             residentDAO.createResident(name, age, usesElevator, hasPet, apartmentId);
-            System.out.println("pojo.Resident added successfully!");
+            System.out.println("Resident added successfully!");
         } catch (SQLException e) {
             System.err.println("Error adding resident: " + e.getMessage());
         }
@@ -25,7 +25,7 @@ public class ResidentService {
     public void editResident(int id, String name, int age, boolean usesElevator, boolean hasPet) {
         try {
             residentDAO.updateResident(id, name, age, usesElevator, hasPet);
-            System.out.println("pojo.Resident updated successfully!");
+            System.out.println("Resident updated successfully!");
         } catch (SQLException e) {
             System.err.println("Error updating resident: " + e.getMessage());
         }
@@ -34,7 +34,7 @@ public class ResidentService {
     public void deleteResident(int id) {
         try {
             residentDAO.deleteResident(id);
-            System.out.println("pojo.Resident deleted successfully!");
+            System.out.println("Resident deleted successfully!");
         } catch (SQLException e) {
             System.err.println("Error deleting resident: " + e.getMessage());
         }

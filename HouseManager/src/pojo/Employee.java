@@ -81,7 +81,7 @@ public class Employee {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", companyId=" + companyId +
-                ", assignedBuildings=" + assignedBuildings.size() +
+                ", assignedBuildings=" + assignedBuildings +
                 '}';
     }
 }

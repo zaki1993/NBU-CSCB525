@@ -36,4 +36,16 @@ public class Resident {
 
     public int getApartmentId() { return apartmentId; }  // Getter for apartmentId
     public void setApartmentId(int apartmentId) { this.apartmentId = apartmentId; }  // Setter for apartmentId
+
+    @Override
+    public String toString() {
+        return "Resident{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", usesElevator=" + usesElevator +
+                ", hasPet=" + hasPet +
+                ", apartmentId=" + apartmentId +
+                '}';
+    }
 }

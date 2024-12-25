@@ -91,7 +91,7 @@ The database consists of the following tables:
 
 ### Key Classes
 
-1. **`pojo.Company`**
+1. **`company`**
     - Represents a property maintenance company.
     - Attributes: `id`, `name`, `address`, `phone`, `employees`.
 

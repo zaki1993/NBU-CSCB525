@@ -130,14 +130,18 @@ public class Building {
 
     @Override
     public String toString() {
-        return "Building{" +
+        String res = "Building{" +
                 "id=" + id +
                 ", address='" + address + '\'' +
                 ", numberOfFloors=" + numberOfFloors +
                 ", numberOfApartments=" + numberOfApartments +
                 ", totalArea=" + totalArea +
-                ", sharedArea=" + sharedArea +
-                ", assignedEmployee=" + (assignedEmployee != null ? assignedEmployee.getName() : "None") +
-                '}';
+                ", sharedArea=" + sharedArea;
+        if (assignedEmployee != null) {
+            res += ", assignedEmployee=" + (assignedEmployee != null ? assignedEmployee.getName() : "None");
+        }
+        res += '}';
+
+        return res;
     }
 }

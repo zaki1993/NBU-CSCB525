@@ -32,10 +32,10 @@ public class Main {
             scanner.nextLine(); // Consume newline
 
             switch (choice) {
-                case 1: // pojo.Company management
+                case 1: // company management
                     manageCompanies(scanner);
                     break;
-                case 2: // pojo.Building management
+                case 2: // building management
                     manageBuildings(scanner);
                     break;
                 case 3: // pojo.Resident management
@@ -71,27 +71,26 @@ public class Main {
         System.out.println("2. Manage Buildings");
         System.out.println("3. Manage Residents");
         System.out.println("4. Manage Employees");
-        System.out.println("5. Assign Buildings to Employees");
-        System.out.println("6. Manage Fees");
-        System.out.println("7. Record Payments");
-        System.out.println("8. Filter and Sort Data");
-        System.out.println("9. Generate Reports");
-        System.out.println("10. Exit");
+        System.out.println("5. Manage Fees");
+        System.out.println("6. Record Payments");
+        System.out.println("7. Filter and Sort Data");
+        System.out.println("8. Generate Reports");
+        System.out.println("9. Exit");
         System.out.print("Enter your choice: ");
     }
 
     private static void manageCompanies(Scanner scanner) {
         System.out.println("\n--- Manage Companies ---");
-        System.out.println("1. Add pojo.Company");
-        System.out.println("2. Edit pojo.Company");
-        System.out.println("3. Delete pojo.Company");
+        System.out.println("1. Add company");
+        System.out.println("2. Edit company");
+        System.out.println("3. Delete company");
         System.out.println("4. List Companies");
         System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
         switch (choice) {
-            case 1: // Add pojo.Company
+            case 1: // Add company
                 System.out.print("Enter company name: ");
                 String name = scanner.nextLine();
                 System.out.print("Enter company address: ");
@@ -100,7 +99,7 @@ public class Main {
                 String phone = scanner.nextLine();
                 companyService.addCompany(name, address, phone);
                 break;
-            case 2: // Edit pojo.Company
+            case 2: // Edit company
                 System.out.print("Enter company ID to edit: ");
                 int editId = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
@@ -112,7 +111,7 @@ public class Main {
                 String newPhone = scanner.nextLine();
                 companyService.editCompany(editId, newName, newAddress, newPhone);
                 break;
-            case 3: // Delete pojo.Company
+            case 3: // Delete company
                 System.out.print("Enter company ID to delete: ");
                 int deleteId = scanner.nextInt();
                 companyService.deleteCompany(deleteId);
@@ -127,16 +126,16 @@ public class Main {
 
     private static void manageBuildings(Scanner scanner) {
         System.out.println("\n--- Manage Buildings ---");
-        System.out.println("1. Add pojo.Building");
-        System.out.println("2. Edit pojo.Building");
-        System.out.println("3. Delete pojo.Building");
+        System.out.println("1. Add building");
+        System.out.println("2. Edit building");
+        System.out.println("3. Delete building");
         System.out.println("4. List Buildings");
         System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
         switch (choice) {
-            case 1: // Add pojo.Building
+            case 1: // Add building
                 System.out.print("Enter building address: ");
                 String address = scanner.nextLine();
                 System.out.print("Enter number of floors: ");
@@ -149,7 +148,7 @@ public class Main {
                 double sharedArea = scanner.nextDouble();
                 buildingService.addBuilding(address, floors, apartments, totalArea, sharedArea);
                 break;
-            case 2: // Edit pojo.Building
+            case 2: // Edit building
                 System.out.print("Enter building ID to edit: ");
                 int editId = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
@@ -165,7 +164,7 @@ public class Main {
                 double newSharedArea = scanner.nextDouble();
                 buildingService.editBuilding(editId, newAddress, newFloors, newApartments, newTotalArea, newSharedArea);
                 break;
-            case 3: // Delete pojo.Building
+            case 3: // Delete building
                 System.out.print("Enter building ID to delete: ");
                 int deleteId = scanner.nextInt();
                 buildingService.deleteBuilding(deleteId);
@@ -248,7 +247,9 @@ public class Main {
                 String phone = scanner.nextLine();
                 System.out.print("Enter employee email: ");
                 String email = scanner.nextLine();
-                employeeService.addEmployee(name, phone, email);
+                System.out.print("Enter company id: ");
+                int companyId = scanner.nextInt();
+                employeeService.addEmployee(name, phone, email, companyId);
                 break;
             case 2: // Edit Employee
                 System.out.print("Enter employee ID to edit: ");
@@ -260,7 +261,9 @@ public class Main {
                 String newPhone = scanner.nextLine();
                 System.out.print("Enter new email: ");
                 String newEmail = scanner.nextLine();
-                employeeService.editEmployee(employeeId, newName, newPhone, newEmail);
+                System.out.print("Enter new company id: ");
+                int newCompanyId = scanner.nextInt();
+                employeeService.editEmployee(employeeId, newName, newPhone, newEmail, newCompanyId);
                 break;
             case 3: // Delete Employee
                 System.out.print("Enter employee ID to delete: ");

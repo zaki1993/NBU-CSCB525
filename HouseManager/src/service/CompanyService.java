@@ -16,7 +16,7 @@ public class CompanyService {
     public void addCompany(String name, String address, String phone) {
         try {
             companyDAO.createCompany(name, address, phone);
-            System.out.println("pojo.Company added successfully!");
+            System.out.println("Company added successfully!");
         } catch (SQLException e) {
             System.err.println("Error adding company: " + e.getMessage());
         }
@@ -25,7 +25,7 @@ public class CompanyService {
     public void editCompany(int id, String name, String address, String phone) {
         try {
             companyDAO.updateCompany(id, name, address, phone);
-            System.out.println("pojo.Company updated successfully!");
+            System.out.println("Company updated successfully!");
         } catch (SQLException e) {
             System.err.println("Error updating company: " + e.getMessage());
         }
@@ -34,7 +34,7 @@ public class CompanyService {
     public void deleteCompany(int id) {
         try {
             companyDAO.deleteCompany(id);
-            System.out.println("pojo.Company deleted successfully!");
+            System.out.println("Company deleted successfully!");
         } catch (SQLException e) {
             System.err.println("Error deleting company: " + e.getMessage());
         }

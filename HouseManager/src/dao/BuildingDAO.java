@@ -17,13 +17,13 @@ public class BuildingDAO {
      * Create a new building record.
      */
     public void createBuilding(String address, int floors, int apartments, double totalArea, double sharedArea) throws SQLException {
-        String query = "INSERT INTO pojo.Building (address, floors, apartments, total_area, shared_area) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO buildings (address, floors, number_of_apartments, total_area, shared_area) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, address);
             stmt.setInt(2, floors);
             stmt.setInt(3, apartments);
             stmt.setDouble(4, totalArea);
-            stmt.setDouble(5, sharedArea); // Include sharedArea
+            stmt.setDouble(5, sharedArea);
             stmt.executeUpdate();
         }
     }
@@ -32,13 +32,13 @@ public class BuildingDAO {
      * Update an existing building record.
      */
     public void updateBuilding(int id, String address, int floors, int apartments, double totalArea, double sharedArea) throws SQLException {
-        String query = "UPDATE pojo.Building SET address = ?, floors = ?, apartments = ?, total_area = ?, shared_area = ? WHERE id = ?";
+        String query = "UPDATE buildings SET address = ?, floors = ?, number_of_apartments = ?, total_area = ?, shared_area = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, address);
             stmt.setInt(2, floors);
             stmt.setInt(3, apartments);
             stmt.setDouble(4, totalArea);
-            stmt.setDouble(5, sharedArea); // Include sharedArea
+            stmt.setDouble(5, sharedArea);
             stmt.setInt(6, id);
             stmt.executeUpdate();
         }
@@ -48,10 +48,13 @@ public class BuildingDAO {
      * Delete a building record by ID.
      */
     public void deleteBuilding(int id) throws SQLException {
-        String query = "DELETE FROM pojo.Building WHERE id = ?";
+        String query = "DELETE FROM buildings WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
-            stmt.executeUpdate();
+            int rowsDeleted = stmt.executeUpdate();
+            if (rowsDeleted <= 0) {
+                throw new SQLException("No building found with the given ID.");
+            }
         }
     }
 
@@ -59,21 +62,23 @@ public class BuildingDAO {
      * Retrieve all building records from the database.
      */
     public List<Building> getAllBuildings() throws SQLException {
-        String query = "SELECT * FROM pojo.Building";
+        String query = "SELECT * FROM buildings";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             List<Building> buildings = new ArrayList<>();
             while (rs.next()) {
-                // Updated to handle sharedArea as well
-                buildings.add(new Building(
+                Building b = new Building(
                         rs.getInt("id"),
                         rs.getString("address"),
                         rs.getInt("floors"),
-                        rs.getInt("apartments"),
+                        rs.getInt("number_of_apartments"),
                         rs.getDouble("total_area"),
-                        rs.getDouble("shared_area") // Map sharedArea
-                ));
+                        rs.getDouble("shared_area")
+                );
+                EmployeeDAO employeeDAO = new EmployeeDAO();
+                b.setAssignedEmployee(employeeDAO.getEmployeeById(rs.getInt("employee_id")));
+                buildings.add(b);
             }
             return buildings;
         }

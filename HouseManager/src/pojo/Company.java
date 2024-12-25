@@ -32,4 +32,15 @@ public class Company {
 
     public List<Employee> getEmployees() { return employees; }
     public void setEmployees(List<Employee> employees) { this.employees = employees; }
+
+    @Override
+    public String toString() {
+        return "Company{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", employees=" + employees +
+                '}';
+    }
 }

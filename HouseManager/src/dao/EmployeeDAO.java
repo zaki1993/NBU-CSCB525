@@ -15,26 +15,20 @@ public class EmployeeDAO {
     }
 
     // Create a new employee
-    public void createEmployee(Employee employee) throws SQLException {
-        String query = "INSERT INTO Employee (name, phone, email) VALUES (?, ?, ?)";
+    public void createEmployee(String name, String phone, String email, int companyId) throws SQLException {
+        String query = "INSERT INTO employees (name, phone, email, company_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, employee.getName());
-            stmt.setString(2, employee.getPhone());
-            stmt.setString(3, employee.getEmail());
+            stmt.setString(1, name);
+            stmt.setString(2, phone);
+            stmt.setString(3, email);
+            stmt.setInt(4, companyId);
             stmt.executeUpdate();
-
-            // Retrieve generated ID
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    employee.setId(keys.getInt(1));
-                }
-            }
         }
     }
 
     // Retrieve an employee by ID
     public Employee getEmployeeById(int id) throws SQLException {
-        String query = "SELECT * FROM Employee WHERE id = ?";
+        String query = "SELECT * FROM employees WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -56,7 +50,7 @@ public class EmployeeDAO {
 
     // Retrieve all employees
     public List<Employee> getAllEmployees() throws SQLException {
-        String query = "SELECT * FROM Employee";
+        String query = "SELECT * FROM employees";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             List<Employee> employees = new ArrayList<>();
@@ -76,33 +70,51 @@ public class EmployeeDAO {
     }
 
     // Update an existing employee
-    public void updateEmployee(Employee employee) throws SQLException {
-        String query = "UPDATE Employee SET name = ?, phone = ?, email = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, employee.getName());
-            stmt.setString(2, employee.getPhone());
-            stmt.setString(3, employee.getEmail());
-            stmt.setInt(4, employee.getId());
-            stmt.executeUpdate();
+    public void updateEmployee(int employeeId, String newName, String newPhone, String newEmail, int newCompanyId) {
+        String sql = "UPDATE employees SET name = ?, phone = ?, email = ?, company_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, newName);
+            stmt.setString(2, newPhone);
+            stmt.setString(3, newEmail);
+            stmt.setInt(4, newCompanyId);
+            stmt.setInt(5, employeeId);
+
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Employee updated successfully.");
+            } else {
+                System.out.println("No employee found with the given ID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error editing employee: " + e.getMessage());
         }
     }
 
     // Delete an employee by ID
-    public void deleteEmployee(int id) throws SQLException {
-        String query = "DELETE FROM Employee WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
+    public void deleteEmployee(int employeeId) throws SQLException {
+        String sql = "DELETE FROM employees WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, employeeId);
+            int rowsDeleted = stmt.executeUpdate();
+            if (rowsDeleted <= 0) {
+                throw new SQLException("No employee found with the given ID.");
+            }
         }
     }
 
     // Assign a building to an employee
     public void assignBuilding(int employeeId, int buildingId) throws SQLException {
-        String query = "UPDATE Building SET employee_id = ? WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        String sql = "UPDATE buildings SET employee_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, employeeId);
             stmt.setInt(2, buildingId);
-            stmt.executeUpdate();
+
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated <= 0) {
+                throw new SQLException("No building found with the given ID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error assigning building: " + e.getMessage());
         }
     }
 
@@ -117,7 +129,7 @@ public class EmployeeDAO {
 
     // Retrieve buildings assigned to an employee
     private List<Building> getAssignedBuildings(int employeeId) throws SQLException {
-        String query = "SELECT * FROM Building WHERE employee_id = ?";
+        String query = "SELECT * FROM buildings WHERE employee_id = ?";
         List<Building> buildings = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -128,7 +140,7 @@ public class EmployeeDAO {
                 buildings.add(new Building(
                         rs.getInt("id"),
                         rs.getString("address"),
-                        rs.getInt("number_of_floors"),
+                        rs.getInt("floors"),
                         rs.getInt("number_of_apartments"),
                         rs.getDouble("total_area"),
                         rs.getDouble("shared_area")
@@ -176,6 +188,32 @@ public class EmployeeDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        return employees;
+    }
+
+    public List<Employee> listEmployees() throws SQLException {
+        String sql = "SELECT e.id, e.name, e.phone, e.email, e.company_id, COUNT(b.id) AS assigned_buildings " +
+                "FROM employees e " +
+                "LEFT JOIN buildings b ON e.id = b.employee_id " +
+                "GROUP BY e.id, e.name, e.phone, e.email";
+
+        List<Employee> employees = new ArrayList<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Employee employee = new Employee(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("phone"),
+                        rs.getString("email"),
+                        rs.getInt("company_id")
+                );
+                employee.setAssignedBuildings(getAssignedBuildings(employee.getId()));
+
+                employees.add(employee);
+            }
         }
         return employees;
     }
