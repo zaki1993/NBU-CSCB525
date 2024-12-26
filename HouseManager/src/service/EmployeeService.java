@@ -64,6 +64,15 @@ public class EmployeeService {
         }
     }
 
+    public void unassignBuildingToEmployee(int buildingId) {
+        try {
+            employeeDAO.unassignBuilding(buildingId);
+            System.out.println("Building unassigned successfully.");
+        } catch (SQLException e) {
+            System.out.println(String.format("Failed to unassign building with id %d", buildingId));
+        }
+    }
+
     public void sortEmployeesByName() throws SQLException {
         List<Employee> employees = employeeDAO.getAllEmployees();
         employees.sort(Comparator.comparing(Employee::getName));

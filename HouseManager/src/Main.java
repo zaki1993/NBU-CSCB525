@@ -45,7 +45,7 @@ public class Main {
                 case 4: // Resident management
                     manageResidents(scanner);
                     break;
-                case 5: // pojo.Employee management
+                case 5: // Employee management
                     manageEmployees(scanner);
                     break;
                 case 6: // Fee management
@@ -240,6 +240,7 @@ public class Main {
         System.out.println("3. Delete Employee");
         System.out.println("4. List Employees");
         System.out.println("5. Assign Building to Employee");
+        System.out.println("6. UnAssign Building");
         System.out.print("Enter your choice: ");
         int choice = scanner.nextInt();
         scanner.nextLine(); // Consume newline
@@ -284,6 +285,11 @@ public class Main {
                 System.out.print("Enter building ID: ");
                 int buildingId = scanner.nextInt();
                 employeeService.assignBuildingToEmployee(empId, buildingId);
+                break;
+            case 6:
+                System.out.print("Enter building ID: ");
+                int buildingIdToUnassign = scanner.nextInt();
+                employeeService.unassignBuildingToEmployee(buildingIdToUnassign);
                 break;
             default:
                 System.out.println("Invalid choice. Returning to main menu.");

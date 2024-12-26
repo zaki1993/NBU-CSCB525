@@ -120,10 +120,15 @@ public class EmployeeDAO {
 
     // Unassign a building from an employee
     public void unassignBuilding(int buildingId) throws SQLException {
-        String query = "UPDATE Building SET employee_id = NULL WHERE id = ?";
+        String query = "UPDATE buildings SET employee_id = NULL WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, buildingId);
-            stmt.executeUpdate();
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated <= 0) {
+                throw new SQLException("No building found with the given ID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error unassigning building: " + e.getMessage());
         }
     }
 

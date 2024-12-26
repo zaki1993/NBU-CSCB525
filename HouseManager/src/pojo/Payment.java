@@ -10,6 +10,8 @@ public class Payment {
     private int employeeId;
     private int companyId;
 
+    private Apartment apartment;
+
     // Constructor
     public Payment(int id, double amount, Date paymentDate, int feeId, int employeeId, int companyId) {
         this.id = id;
@@ -69,6 +71,14 @@ public class Payment {
         this.companyId = companyId;
     }
 
+    public Apartment getApartment() {
+        return apartment;
+    }
+
+    public void setApartment(Apartment apartment) {
+        this.apartment = apartment;
+    }
+
     @Override
     public String toString() {
         return "Payment{" +
@@ -78,6 +88,7 @@ public class Payment {
                 ", feeId=" + feeId +
                 ", employeeId=" + employeeId +
                 ", companyId=" + companyId +
+                ", apartment=" + apartment +
                 '}';
     }
 }

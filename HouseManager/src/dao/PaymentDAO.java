@@ -1,5 +1,6 @@
 package dao;
 
+import pojo.Apartment;
 import pojo.Payment;
 import utils.DatabaseConfig;
 
@@ -62,14 +63,20 @@ public class PaymentDAO {
     // Method to get payments by date range
     public List<Payment> getPaymentsByDateRange(String startDate, String endDate) throws SQLException {
         List<Payment> payments = new ArrayList<>();
-        String sql = "SELECT * FROM payments WHERE payment_date BETWEEN DATE(?) AND DATE(?)";
+        String sql = """
+        SELECT p.id, p.amount, p.payment_date, p.fee_id, p.employee_id, p.company_id, 
+               a.id AS apartment_id, a.number, a.floor, a.building_id, a.area
+        FROM payments p
+        INNER JOIN fees f ON p.fee_id = f.id
+        INNER JOIN apartments a ON f.apartment_id = a.id
+        WHERE p.payment_date BETWEEN ? AND ?
+        ORDER BY p.payment_date
+    """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            // Set the start and end date parameters
-            stmt.setString(1, startDate);
-            stmt.setString(2, endDate);
+            stmt.setDate(1, Date.valueOf(startDate));
+            stmt.setDate(2, Date.valueOf(endDate));
 
-            // Execute the query
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Payment payment = new Payment(
@@ -80,12 +87,25 @@ public class PaymentDAO {
                             rs.getInt("employee_id"),
                             rs.getInt("company_id")
                     );
+
+                    // Create apartment object
+                    Apartment apartment = new Apartment(
+                            rs.getInt("apartment_id"),
+                            rs.getInt("number"),
+                            rs.getInt("floor"),
+                            rs.getDouble("area"),
+                            rs.getInt("building_id")
+                    );
+
+                    // Attach apartment to payment for reporting purposes
+                    payment.setApartment(apartment);
                     payments.add(payment);
                 }
             }
         }
         return payments;
     }
+
 
     public List<Payment> getPaymentsByApartment(int apartmentId) throws SQLException {
         String query = "SELECT p.* FROM payments p " +

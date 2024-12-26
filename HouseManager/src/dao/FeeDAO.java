@@ -102,12 +102,23 @@ public class FeeDAO {
     }
 
     public double getOutstandingFeesByApartment(int apartmentId) throws SQLException {
-        String sql = "SELECT COALESCE(SUM(amount), 0) - COALESCE(SUM((SELECT COALESCE(SUM(amount), 0) " +
-                "FROM payments WHERE payments.fee_id = fees.id)), 0) AS outstanding " +
-                "FROM fees WHERE apartment_id = ?";
+        String sql = """
+                        SELECT 
+                            (SELECT SUM(amount) FROM fees WHERE apartment_id = ?) AS total_fees,
+                            (SELECT COALESCE(SUM(amount), 0) 
+                             FROM payments 
+                             WHERE fee_id IN (SELECT id FROM fees WHERE apartment_id = ?)) AS total_payments,
+                            (SELECT SUM(amount) FROM fees WHERE apartment_id = ?) - 
+                            (SELECT COALESCE(SUM(amount), 0) 
+                             FROM payments 
+                             WHERE fee_id IN (SELECT id FROM fees WHERE apartment_id = ?)) AS outstanding
+                    """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, apartmentId);
+            stmt.setInt(2, apartmentId);
+            stmt.setInt(3, apartmentId);
+            stmt.setInt(4, apartmentId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
