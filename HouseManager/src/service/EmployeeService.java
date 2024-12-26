@@ -44,7 +44,12 @@ public class EmployeeService {
     public void listEmployees() {
         try {
             List<Employee> employees = employeeDAO.listEmployees();
-            employees.forEach(System.out::println);
+            if (employees.isEmpty()) {
+                System.out.println("\n--- No employees found! ---");
+            } else {
+                System.out.println("\n--- List of Employees ---");
+                employees.forEach(System.out::println);
+            }
         } catch (SQLException e) {
             System.err.println("Error retrieving employees: " + e.getMessage());
         }

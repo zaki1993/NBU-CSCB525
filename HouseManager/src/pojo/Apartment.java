@@ -2,21 +2,20 @@ package pojo;
 
 public class Apartment {
     private int id;
-    private String apartmentNumber;
+    private int number;
+    private int floor;
     private double area;
-    private String ownerName;
-    private Building building; // Reference to the building this apartment belongs to
 
-    // Constructor
-    public Apartment(int id, String apartmentNumber, double area, String ownerName, Building building) {
+    private int buildingId; // Reference to the building this apartment belongs to
+
+    public Apartment(int id, int number, int floor, double area, int buildingId) {
         this.id = id;
-        this.apartmentNumber = apartmentNumber;
+        this.number = number;
+        this.floor = floor;
         this.area = area;
-        this.ownerName = ownerName;
-        this.building = building;
+        this.buildingId = buildingId;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -25,15 +24,20 @@ public class Apartment {
         this.id = id;
     }
 
-    public String getApartmentNumber() {
-        return apartmentNumber;
+    public int getNumber() {
+        return number;
     }
 
-    public void setApartmentNumber(String apartmentNumber) {
-        if (apartmentNumber == null || apartmentNumber.trim().isEmpty()) {
-            throw new IllegalArgumentException("Apartment number cannot be empty.");
-        }
-        this.apartmentNumber = apartmentNumber;
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public int getFloor() {
+        return floor;
+    }
+
+    public void setFloor(int floor) {
+        this.floor = floor;
     }
 
     public double getArea() {
@@ -41,39 +45,25 @@ public class Apartment {
     }
 
     public void setArea(double area) {
-        if (area <= 0) {
-            throw new IllegalArgumentException("Area must be greater than 0.");
-        }
         this.area = area;
     }
 
-    public String getOwnerName() {
-        return ownerName;
+    public int getBuildingId() {
+        return buildingId;
     }
 
-    public void setOwnerName(String ownerName) {
-        if (ownerName == null || ownerName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Owner name cannot be empty.");
-        }
-        this.ownerName = ownerName;
-    }
-
-    public Building getBuilding() {
-        return building;
-    }
-
-    public void setBuilding(Building building) {
-        this.building = building;
+    public void setBuildingId(int buildingId) {
+        this.buildingId = buildingId;
     }
 
     @Override
     public String toString() {
         return "Apartment{" +
                 "id=" + id +
-                ", apartmentNumber='" + apartmentNumber + '\'' +
+                ", number=" + number +
+                ", floor=" + floor +
                 ", area=" + area +
-                ", ownerName='" + ownerName + '\'' +
-                ", building=" + building.getAddress() +
+                ", buildingId=" + buildingId +
                 '}';
     }
 }

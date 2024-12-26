@@ -3,7 +3,6 @@ package service;
 import dao.PaymentDAO;
 import pojo.Payment;
 
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,11 +24,49 @@ public class PaymentService {
         }
     }
 
-    public void listPayments() {
-        List<Payment> payments = paymentDAO.listPayments();
-        System.out.println("--- List of Payments ---");
-        for (Payment payment : payments) {
-            System.out.println(payment);
+    public void listAllPayments() {
+        try {
+            List<Payment> payments = paymentDAO.listPayments();
+            if (payments.isEmpty()) {
+                System.out.println("\n--- No payments found! ---");
+            } else {
+                System.out.println("--- List of Payments ---");
+                for (Payment payment : payments) {
+                    System.out.println(payment);
+                }
+                System.out.println("--- Total Payments ---");
+                System.out.println(paymentDAO.getTotalPayments());
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem while fetching all payments: " + ex.getMessage());
+        }
+    }
+
+    public void listPaymentsByDateRange(String startDate, String endDate) {
+        try {
+            List<Payment> payments = paymentDAO.getPaymentsByDateRange(startDate, endDate);
+            if (payments.isEmpty()) {
+                System.out.println("\n--- No payments found! ---");
+            } else {
+                System.out.println("\n--- List of Payments ---");
+                payments.forEach(System.out::println);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem while fetching payments: " + ex.getMessage());
+        }
+    }
+
+    public void listPaymentsByApartment(int apartmentId) {
+        try {
+            List<Payment> payments = paymentDAO.getPaymentsByApartment(apartmentId);
+            if (payments.isEmpty()) {
+                System.out.println("\n--- No payments found! ---");
+            } else {
+                System.out.println("\n--- List of Payments ---");
+                payments.forEach(System.out::println);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem while fetching payments: " + ex.getMessage());
         }
     }
 }

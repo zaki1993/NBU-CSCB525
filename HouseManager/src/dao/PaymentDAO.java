@@ -27,7 +27,7 @@ public class PaymentDAO {
         }
     }
 
-    public List<Payment> listPayments() {
+    public List<Payment> listPayments() throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = "SELECT * FROM payments";
         try (Statement stmt = connection.createStatement();
@@ -43,13 +43,11 @@ public class PaymentDAO {
                 );
                 payments.add(payment);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return payments;
     }
 
-    public double getTotalPayments() {
+    public double getTotalPayments() throws SQLException {
         double totalPayments = 0;
         String sql = "SELECT SUM(amount) FROM payments";
         try (Statement stmt = connection.createStatement();
@@ -57,16 +55,14 @@ public class PaymentDAO {
             if (rs.next()) {
                 totalPayments = rs.getDouble(1);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return totalPayments;
     }
 
     // Method to get payments by date range
-    public List<Payment> getPaymentsByDateRange(String startDate, String endDate) {
+    public List<Payment> getPaymentsByDateRange(String startDate, String endDate) throws SQLException {
         List<Payment> payments = new ArrayList<>();
-        String sql = "SELECT * FROM payments WHERE payment_date BETWEEN ? AND ?";
+        String sql = "SELECT * FROM payments WHERE payment_date BETWEEN DATE(?) AND DATE(?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             // Set the start and end date parameters
@@ -87,9 +83,30 @@ public class PaymentDAO {
                     payments.add(payment);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return payments;
+    }
+
+    public List<Payment> getPaymentsByApartment(int apartmentId) throws SQLException {
+        String query = "SELECT p.* FROM payments p " +
+                "JOIN fees f ON p.fee_id = f.id " +
+                "WHERE f.apartment_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, apartmentId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Payment> payments = new ArrayList<>();
+                while (resultSet.next()) {
+                    payments.add(new Payment(
+                            resultSet.getInt("id"),
+                            resultSet.getDouble("amount"),
+                            resultSet.getDate("payment_date"),
+                            resultSet.getInt("fee_id"),
+                            resultSet.getInt("employee_id"),
+                            resultSet.getInt("company_id")
+                    ));
+                }
+                return payments;
+            }
+        }
     }
 }

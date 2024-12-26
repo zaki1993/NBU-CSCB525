@@ -44,7 +44,12 @@ public class BuildingService {
     public void listBuildings() {
         try {
             List<Building> buildings = buildingDAO.getAllBuildings();
-            buildings.forEach(System.out::println);
+            if (buildings.isEmpty()) {
+                System.out.println("\n--- No buildings found! ---");
+            } else {
+                System.out.println("\n--- List of Buildings ---");
+                buildings.forEach(System.out::println);
+            }
         } catch (SQLException e) {
             System.err.println("Error retrieving buildings: " + e.getMessage());
         }

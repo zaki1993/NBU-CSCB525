@@ -49,6 +49,7 @@ public class FeeService {
             if (fees.isEmpty()) {
                 System.out.println("No fees found.");
             } else {
+                System.out.println("\n--- List of Fees ---");
                 for (Fee fee : fees) {
                     System.out.println(fee);
                 }

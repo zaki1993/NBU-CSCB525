@@ -14,7 +14,7 @@ public class ResidentDAO {
     }
 
     public void createResident(String name, int age, boolean usesElevator, boolean hasPet, int apartmentId) throws SQLException {
-        String query = "INSERT INTO pojo.Resident (name, age, uses_elevator, has_pet, apartment_id) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO residents (name, age, uses_elevator, has_pet, apartment_id) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, name);
             stmt.setInt(2, age);
@@ -26,7 +26,7 @@ public class ResidentDAO {
     }
 
     public void updateResident(int id, String name, int age, boolean usesElevator, boolean hasPet) throws SQLException {
-        String query = "UPDATE pojo.Resident SET name = ?, age = ?, uses_elevator = ?, has_pet = ? WHERE id = ?";
+        String query = "UPDATE residents SET name = ?, age = ?, uses_elevator = ?, has_pet = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, name);
             stmt.setInt(2, age);
@@ -38,15 +38,18 @@ public class ResidentDAO {
     }
 
     public void deleteResident(int id) throws SQLException {
-        String query = "DELETE FROM pojo.Resident WHERE id = ?";
+        String query = "DELETE FROM residents WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
-            stmt.executeUpdate();
+            int rowsDeleted = stmt.executeUpdate();
+            if (rowsDeleted <= 0) {
+                throw new SQLException("No resident found with the given ID.");
+            }
         }
     }
 
     public List<Resident> getAllResidents() throws SQLException {
-        String query = "SELECT * FROM pojo.Resident";
+        String query = "SELECT * FROM residents";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
@@ -73,9 +76,11 @@ public class ResidentDAO {
     }
 
     // Method to get residents by building ID
-    public List<Resident> getResidentsByBuilding(int buildingId) {
+    public List<Resident> getResidentsByBuilding(int buildingId) throws SQLException {
         List<Resident> residents = new ArrayList<>();
-        String sql = "SELECT * FROM residents WHERE building_id = ?";
+        String sql = "SELECT r.* FROM residents r " +
+                "JOIN apartments a ON r.apartment_id = a.id " +
+                "WHERE a.building_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             // Set the building ID parameter
@@ -84,11 +89,39 @@ public class ResidentDAO {
             // Execute the query
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    residents.add(new Resident(rs.getInt("id"), rs.getString("name"), rs.getInt("age"), rs.getBoolean("uses_elevator"), rs.getBoolean("has_pet"), rs.getInt("apartment_id")));
+                    residents.add(new Resident(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getInt("age"),
+                            rs.getBoolean("uses_elevator"),
+                            rs.getBoolean("has_pet"),
+                            rs.getInt("apartment_id")
+                    ));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        return residents;
+    }
+
+    public List<Resident> getResidentsByApartment(int apartmentId) throws SQLException {
+        List<Resident> residents = new ArrayList<>();
+        String sql = "SELECT * FROM residents WHERE apartment_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, apartmentId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    residents.add(new Resident(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getInt("age"),
+                            rs.getBoolean("uses_elevator"),
+                            rs.getBoolean("has_pet"),
+                            rs.getInt("apartment_id")
+                    ));
+                }
+            }
         }
         return residents;
     }

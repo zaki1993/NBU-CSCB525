@@ -12,8 +12,8 @@ public class Main {
     private static EmployeeService employeeService;
     private static FeeService feeService;
     private static ReportService reportService;
-
     private static PaymentService paymentService;
+    private static ApartmentService apartmentService;
 
     public static void main(String[] args) throws SQLException {
         companyService = new CompanyService();
@@ -23,6 +23,7 @@ public class Main {
         feeService = new FeeService();
         reportService = new ReportService();
         paymentService = new PaymentService();
+        apartmentService = new ApartmentService();
 
         Scanner scanner = new Scanner(System.in);
 
@@ -32,31 +33,34 @@ public class Main {
             scanner.nextLine(); // Consume newline
 
             switch (choice) {
-                case 1: // company management
+                case 1: // Company management
                     manageCompanies(scanner);
                     break;
-                case 2: // building management
+                case 2: // Building management
                     manageBuildings(scanner);
                     break;
-                case 3: // pojo.Resident management
+                case 3: // Apartments management
+                    manageApartments(scanner);
+                    break;
+                case 4: // Resident management
                     manageResidents(scanner);
                     break;
-                case 4: // pojo.Employee management
+                case 5: // pojo.Employee management
                     manageEmployees(scanner);
                     break;
-                case 5: // Fee management
+                case 6: // Fee management
                     manageFees(scanner);
                     break;
-                case 6: // Record payments
+                case 7: // Record payments
                     recordPayments(scanner);
                     break;
-                case 7: // Filter and sort data
+                case 8: // Filter and sort data
                     filterAndSortData(scanner);
                     break;
-                case 8: // Generate reports
+                case 9: // Generate reports
                     generateReports(scanner);
                     break;
-                case 9: // Exit
+                case 10: // Exit
                     System.out.println("Exiting the application. Goodbye!");
                     return;
                 default:
@@ -69,13 +73,14 @@ public class Main {
         System.out.println("\nElectronic Property Manager");
         System.out.println("1. Manage Companies");
         System.out.println("2. Manage Buildings");
-        System.out.println("3. Manage Residents");
-        System.out.println("4. Manage Employees");
-        System.out.println("5. Manage Fees");
-        System.out.println("6. Record Payments");
-        System.out.println("7. Filter and Sort Data");
-        System.out.println("8. Generate Reports");
-        System.out.println("9. Exit");
+        System.out.println("3. Manage Apartments");
+        System.out.println("4. Manage Residents");
+        System.out.println("5. Manage Employees");
+        System.out.println("6. Manage Fees");
+        System.out.println("7. Record Payments");
+        System.out.println("8. Filter and Sort Data");
+        System.out.println("9. Generate Reports");
+        System.out.println("10. Exit");
         System.out.print("Enter your choice: ");
     }
 
@@ -330,19 +335,49 @@ public class Main {
     }
 
     private static void recordPayments(Scanner scanner) {
-        System.out.println("\n--- Record Payments ---");
-        System.out.print("Enter fee ID: ");
-        int feeId = scanner.nextInt();
-        System.out.print("Enter employee ID: ");
-        int employeeId = scanner.nextInt();
-        System.out.print("Enter company ID: ");
-        int companyId = scanner.nextInt();
-        System.out.print("Enter payment amount: ");
-        double amount = scanner.nextDouble();
+        System.out.println("\n--- Manage Payments ---");
+        System.out.println("1. Record Payment");
+        System.out.println("2. List All Payments");
+        System.out.println("3. List Payments Between Two Dates");
+        System.out.println("4. List Payments for a Specific Apartment");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
         scanner.nextLine(); // Consume newline
-        System.out.print("Enter payment date (YYYY-MM-DD): ");
-        String paymentDate = scanner.nextLine();
-        paymentService.addPayment(amount, paymentDate, feeId, employeeId, companyId);
+
+        switch (choice) {
+            case 1: // Record Payment
+                System.out.print("Enter fee ID: ");
+                int feeId = scanner.nextInt();
+                System.out.print("Enter employee ID: ");
+                int employeeId = scanner.nextInt();
+                System.out.print("Enter company ID: ");
+                int companyId = scanner.nextInt();
+                System.out.print("Enter payment amount: ");
+                double amount = scanner.nextDouble();
+                scanner.nextLine(); // Consume newline
+                System.out.print("Enter payment date (YYYY-MM-DD): ");
+                String paymentDate = scanner.nextLine();
+                paymentService.addPayment(amount, paymentDate, feeId, employeeId, companyId);
+                break;
+
+            case 2: // List All Payments
+                paymentService.listAllPayments();
+                break;
+
+            case 3: // List Payments Between Two Dates
+                System.out.print("Enter start date (YYYY-MM-DD): ");
+                String startDate = scanner.nextLine();
+                System.out.print("Enter end date (YYYY-MM-DD): ");
+                String endDate = scanner.nextLine();
+                paymentService.listPaymentsByDateRange(startDate, endDate);
+                break;
+
+            case 4: // List Payments for a Specific Apartment
+                System.out.print("Enter apartment ID: ");
+                int apartmentId = scanner.nextInt();
+                paymentService.listPaymentsByApartment(apartmentId);
+                break;
+        }
     }
 
     private static void filterAndSortData(Scanner scanner) throws SQLException {
@@ -410,6 +445,60 @@ public class Main {
             case 3: // Generate Detailed Building Assignment Report
                 reportService.generateBuildingAssignmentReport();
                 break;
+            default:
+                System.out.println("Invalid choice. Returning to main menu.");
+        }
+    }
+
+    private static void manageApartments(Scanner scanner) {
+        System.out.println("\n--- Manage Apartments ---");
+        System.out.println("1. Add Apartment");
+        System.out.println("2. Edit Apartment");
+        System.out.println("3. Delete Apartment");
+        System.out.println("4. List Apartments");
+        System.out.print("Enter your choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        switch (choice) {
+            case 1: // Add Apartment
+                System.out.print("Enter apartment number: ");
+                int number = scanner.nextInt();
+                System.out.print("Enter apartment floor: ");
+                int floor = scanner.nextInt();
+                System.out.print("Enter apartment area (sq ft): ");
+                double area = scanner.nextDouble();
+                System.out.print("Enter building ID: ");
+                int buildingId = scanner.nextInt();
+                apartmentService.addApartment(number, floor, area, buildingId);
+                break;
+
+            case 2: // Edit Apartment
+                System.out.print("Enter apartment ID to edit: ");
+                int id = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                System.out.print("Enter new apartment number: ");
+                int newApartmentNumber = scanner.nextInt();
+                System.out.print("Enter new apartment floor: ");
+                int newFloor = scanner.nextInt();
+                System.out.print("Enter new apartment area (sq ft): ");
+                double newArea = scanner.nextDouble();
+                scanner.nextLine(); // Consume newline
+                System.out.print("Enter new building ID: ");
+                int newBuildingId = scanner.nextInt();
+                apartmentService.updateApartment(id, newApartmentNumber, newFloor, newArea, newBuildingId);
+                break;
+
+            case 3: // Delete Apartment
+                System.out.print("Enter apartment ID to delete: ");
+                int deleteId = scanner.nextInt();
+                apartmentService.deleteApartment(deleteId);
+                break;
+
+            case 4: // List Apartments
+                apartmentService.listAllApartments();
+                break;
+
             default:
                 System.out.println("Invalid choice. Returning to main menu.");
         }

@@ -43,7 +43,12 @@ public class CompanyService {
     public void listCompanies() {
         try {
             List<Company> companies = companyDAO.getAllCompanies();
-            companies.forEach(System.out::println);
+            if (companies.isEmpty()) {
+                System.out.println("\n--- No companies found! ---");
+            } else {
+                System.out.println("\n--- List of Companies ---");
+                companies.forEach(System.out::println);
+            }
         } catch (SQLException e) {
             System.err.println("Error retrieving companies: " + e.getMessage());
         }

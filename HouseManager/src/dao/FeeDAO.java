@@ -38,7 +38,10 @@ public class FeeDAO {
         String sql = "DELETE FROM fees WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, feeId);
-            stmt.executeUpdate();
+            int rowsDeleted = stmt.executeUpdate();
+            if (rowsDeleted <= 0) {
+                throw new SQLException("No fee found with the given ID.");
+            }
         }
     }
 
@@ -64,7 +67,7 @@ public class FeeDAO {
     // Method to filter fees by due date
     public List<Fee> filterFeesByDueDate(String dueDate) {
         List<Fee> fees = new ArrayList<>();
-        String sql = "SELECT * FROM fees WHERE due_date = ?";
+        String sql = "SELECT * FROM fees WHERE due_date = DATE(?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, dueDate);  // Set the provided due date
             try (ResultSet rs = stmt.executeQuery()) {
@@ -96,5 +99,22 @@ public class FeeDAO {
             e.printStackTrace();
         }
         return count;
+    }
+
+    public double getOutstandingFeesByApartment(int apartmentId) throws SQLException {
+        String sql = "SELECT COALESCE(SUM(amount), 0) - COALESCE(SUM((SELECT COALESCE(SUM(amount), 0) " +
+                "FROM payments WHERE payments.fee_id = fees.id)), 0) AS outstanding " +
+                "FROM fees WHERE apartment_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, apartmentId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("outstanding");
+                }
+            }
+        }
+        return 0;
     }
 }

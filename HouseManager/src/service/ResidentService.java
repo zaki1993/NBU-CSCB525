@@ -43,7 +43,12 @@ public class ResidentService {
     public void listResidents() {
         try {
             List<Resident> residents = residentDAO.getAllResidents();
-            residents.forEach(System.out::println);
+            if (residents.isEmpty()) {
+                System.out.println("\n--- No residents found! ---");
+            } else {
+                System.out.println("\n--- List of Residents ---");
+                residents.forEach(System.out::println);
+            }
         } catch (SQLException e) {
             System.err.println("Error retrieving residents: " + e.getMessage());
         }
@@ -55,11 +60,15 @@ public class ResidentService {
     }
 
     public void filterResidentsByBuilding(int buildingId) {
-        List<Resident> residents = residentDAO.getResidentsByBuilding(buildingId);
-        if (residents.isEmpty()) {
-            System.out.println("No residents found in this building.");
-        } else {
-            residents.forEach(System.out::println);
+        try {
+            List<Resident> residents = residentDAO.getResidentsByBuilding(buildingId);
+            if (residents.isEmpty()) {
+                System.out.println("No residents found in this building.");
+            } else {
+                residents.forEach(System.out::println);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error while fetching residents: " + ex.getMessage());
         }
     }
 }

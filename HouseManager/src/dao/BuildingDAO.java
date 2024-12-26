@@ -1,6 +1,7 @@
 package dao;
 
 import pojo.Building;
+import pojo.Employee;
 import utils.DatabaseConfig;
 
 import java.sql.*;
@@ -96,5 +97,27 @@ public class BuildingDAO {
             e.printStackTrace();
         }
         return count;
+    }
+
+    // Retrieve a building by ID
+    public Building getBuildingById(int id) throws SQLException {
+        String query = "SELECT * FROM buildings WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Building b = new Building(
+                        rs.getInt("id"),
+                        rs.getString("address"),
+                        rs.getInt("floors"),
+                        rs.getInt("number_of_apartments"),
+                        rs.getDouble("total_area"),
+                        rs.getDouble("shared_area")
+                );
+                return b;
+            }
+        }
+        return null;
     }
 }

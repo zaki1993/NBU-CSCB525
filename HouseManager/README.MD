@@ -107,7 +107,7 @@ The database consists of the following tables:
     - Represents an apartment in a building.
     - Attributes: `id`, `number`, `floor`, `area`, `building`.
 
-5. **`pojo.Resident`**
+5. **`Resident`**
     - Represents a resident in an apartment.
     - Attributes: `id`, `name`, `age`, `usesElevator`, `hasPet`.
 
@@ -136,7 +136,7 @@ The service layer contains the following:
 Each Java class mirrors its database table and maintains relationships using lists and references. For example:
 - `pojo.Employee` contains a `List<pojo.Building>`.
 - `pojo.Building` contains a `List<Apartment>`.
-- `Apartment` contains a `List<pojo.Resident>`.
+- `Apartment` contains a `List<Resident>`.
 
 ---
 
