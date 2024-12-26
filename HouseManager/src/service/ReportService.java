@@ -109,6 +109,10 @@ public class ReportService {
                             // Fetch outstanding fees for the apartment
                             double outstandingFees = feeDAO.getOutstandingFeesByApartment(apartment.getId());
                             System.out.println("\t\t\tOutstanding Fees: $" + outstandingFees);
+
+                            // Fetch total payments for the apartment
+                            double totalPayments = paymentDAO.getPaymentsByApartment(apartment.getId()).stream().mapToDouble(p -> p.getAmount()).sum();
+                            System.out.println("\t\t\tTotal Payments Made: $" + totalPayments);
                         }
                     }
                 }
