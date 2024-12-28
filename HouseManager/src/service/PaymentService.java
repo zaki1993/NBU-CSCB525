@@ -69,4 +69,8 @@ public class PaymentService {
             System.out.println("Problem while fetching payments: " + ex.getMessage());
         }
     }
+
+    public List<Payment> getPaymentsForApartment(int apartmentId) throws SQLException {
+        return paymentDAO.getPaymentsByApartment(apartmentId);
+    }
 }

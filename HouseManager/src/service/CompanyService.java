@@ -71,4 +71,8 @@ public class CompanyService {
         }
         return false;
     }
+
+    public Company getCompanyByEmployee(int employeeId) throws SQLException {
+        return companyDAO.getCompanyByEmployee(employeeId);
+    }
 }

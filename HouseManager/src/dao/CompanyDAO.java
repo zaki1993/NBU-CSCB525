@@ -99,4 +99,31 @@ public class CompanyDAO {
 
         return company; // Returns null if no company is found
     }
+
+    public Company getCompanyByEmployee(int employeeId) throws SQLException {
+        String query = "SELECT c.id, c.name, c.address, c.phone " +
+                "FROM employees e " +
+                "JOIN companies c ON e.company_id = c.id " +
+                "WHERE e.id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, employeeId);  // Set the employee ID parameter
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // If a company is found, create and return the Company object
+                    Company company = new Company(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("address"),
+                            rs.getString("phone")
+                    );
+                    return company;
+                }
+            }
+        }
+
+        // If no company is found for the given employee ID, return null
+        return null;
+    }
 }

@@ -63,4 +63,8 @@ public class ApartmentService {
         }
         return false;
     }
+
+    public Apartment getApartmentById(int apartmentId) throws SQLException {
+        return apartmentDAO.getApartmentById(apartmentId);
+    }
 }

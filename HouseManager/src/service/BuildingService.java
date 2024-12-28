@@ -71,4 +71,8 @@ public class BuildingService {
         }
         return false;
     }
+
+    public Building getBuildingById(int buildingId) throws SQLException {
+        return buildingDAO.getBuildingById(buildingId);
+    }
 }

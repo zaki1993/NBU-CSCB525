@@ -1,9 +1,14 @@
+import pojo.*;
 import service.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -712,6 +717,13 @@ public class Main {
 
         switch (choice) {
             case 1: // Record Payment
+                // Validate apartment ID
+                System.out.print("Enter apartment ID: ");
+                int apartmentId = scanner.nextInt();
+                if (!apartmentService.isApartmentExist(apartmentId)) {
+                    System.out.println("Invalid apartment ID. Please try again.");
+                    return;
+                }
                 // Validate fee ID
                 System.out.print("Enter fee ID: ");
                 int feeId = scanner.nextInt();
@@ -727,13 +739,11 @@ public class Main {
                     System.out.println("Invalid employee ID. Please try again.");
                     return;
                 }
-
-                // Validate company ID
-                System.out.print("Enter company ID: ");
-                int companyId = scanner.nextInt();
-                if (!companyService.isCompanyExist(companyId)) {
-                    System.out.println("Invalid company ID. Please try again.");
-                    return;
+                int companyId = 0;
+                try {
+                    companyId = companyService.getCompanyByEmployee(employeeId).getId();
+                } catch (SQLException e) {
+                    System.out.println("Company is not valid for employee");
                 }
 
                 // Validate payment amount
@@ -754,6 +764,7 @@ public class Main {
 
                 // Proceed with recording the payment
                 paymentService.addPayment(amount, paymentDate, feeId, employeeId, companyId);
+                recordPaidFeesToFile(apartmentId, validateDate(paymentDate));
                 break;
 
             case 2: // List All Payments
@@ -784,7 +795,7 @@ public class Main {
             case 4: // List Payments for a Specific Apartment
                 // Validate apartment ID
                 System.out.print("Enter apartment ID: ");
-                int apartmentId = scanner.nextInt();
+                apartmentId = scanner.nextInt();
                 if (!apartmentService.isApartmentExist(apartmentId)) {
                     System.out.println("Invalid apartment ID. Please try again.");
                     return;
@@ -1116,5 +1127,48 @@ public class Main {
         // A simple regex to validate email format
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email.matches(emailRegex);
+    }
+
+    public static void recordPaidFeesToFile(int apartmentId, Date paymentDate) {
+        try {
+            // Fetch payments for the apartment
+            List<Payment> payments = paymentService.getPaymentsForApartment(apartmentId);
+
+            // Fetch the relevant building and employee
+            Apartment apartment = apartmentService.getApartmentById(apartmentId);
+            Building building = buildingService.getBuildingById(apartment.getBuildingId());
+            Employee employee = building.getAssignedEmployee();
+            Company company = companyService.getCompanyByEmployee(employee.getId());
+
+            // Prepare file for writing
+            FileWriter fw = new FileWriter("paid_fees.csv", true); // Append to the file
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            // Write header if the file is empty
+            if (new java.io.File("paid_fees.csv").length() == 0) {
+                bw.write("Company, Employee, Building, Apartment, Amount, Payment Date\n");
+            }
+
+            // Loop through all payments and write them to the file
+            for (Payment payment : payments) {
+                String record = String.format("%s, %s, %s, %s, %.2f, %s\n",
+                        company.getName(),
+                        employee.getName(),
+                        building.getAddress(),
+                        apartment.getNumber(),
+                        payment.getAmount(),
+                        new SimpleDateFormat("yyyy-MM-dd").format(payment.getPaymentDate())
+                );
+                bw.write(record); // Write the record
+            }
+
+            // Close the file
+            bw.close();
+            fw.close();
+
+            System.out.println("Paid fees have been recorded successfully!");
+        } catch (IOException | SQLException e) {
+            System.out.println("Error while recording paid fees: " + e.getMessage());
+        }
     }
 }

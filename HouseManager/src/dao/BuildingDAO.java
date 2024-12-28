@@ -120,6 +120,8 @@ public class BuildingDAO {
                         rs.getDouble("total_area"),
                         rs.getDouble("shared_area")
                 );
+                Employee e = new EmployeeDAO().getEmployeeById(rs.getInt("employee_id"));
+                b.setAssignedEmployee(e);
                 return b;
             }
         }
