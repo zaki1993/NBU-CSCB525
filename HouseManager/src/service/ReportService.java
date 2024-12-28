@@ -111,8 +111,37 @@ public class ReportService {
                             System.out.println("\t\t\tOutstanding Fees: $" + outstandingFees);
 
                             // Fetch total payments for the apartment
-                            double totalPayments = paymentDAO.getPaymentsByApartment(apartment.getId()).stream().mapToDouble(p -> p.getAmount()).sum();
+                            double totalPayments = paymentDAO.getPaymentsByApartment(apartment.getId())
+                                    .stream().mapToDouble(p -> p.getAmount()).sum();
                             System.out.println("\t\t\tTotal Payments Made: $" + totalPayments);
+
+                            // Fetch unpaid or partially paid fees
+                            List<Fee> unpaidFees = feeDAO.getUnpaidFeesByApartment(apartment.getId());
+                            if (unpaidFees.isEmpty()) {
+                                System.out.println("\t\t\tNo unpaid fees for this apartment.");
+                            } else {
+                                System.out.println("\t\t\tUnpaid or Partially Paid Fees:");
+                                for (Fee fee : unpaidFees) {
+                                    double paidAmount = paymentDAO.getPaymentsForFee(fee.getId())
+                                            .stream().mapToDouble(p -> p.getAmount()).sum();
+                                    double remainingAmount = fee.getAmount() - paidAmount;
+
+                                    if (remainingAmount > 0 && paidAmount > 0) {
+                                        System.out.println("\t\t\t\tFee ID: " + fee.getId() +
+                                                ", Due Date: " + fee.getDueDate() +
+                                                ", Total Amount: $" + fee.getAmount() +
+                                                ", Paid: $" + paidAmount +
+                                                ", Remaining: $" + remainingAmount +
+                                                " (Partially Paid)");
+                                    } else {
+                                        System.out.println("\t\t\t\tFee ID: " + fee.getId() +
+                                                ", Due Date: " + fee.getDueDate() +
+                                                ", Total Amount: $" + fee.getAmount() +
+                                                ", Remaining: $" + remainingAmount +
+                                                " (Unpaid)");
+                                    }
+                                }
+                            }
                         }
                     }
                 }

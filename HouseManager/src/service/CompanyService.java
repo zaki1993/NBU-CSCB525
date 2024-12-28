@@ -59,4 +59,16 @@ public class CompanyService {
         companies.sort(Comparator.comparing(Company::getName));
         companies.forEach(System.out::println);
     }
+
+    // Helper method to validate Company ID existence
+    public boolean isCompanyExist(int companyId) {
+        // Check if the company with the given ID exists
+        try {
+            return companyDAO.getCompanyById(companyId) != null;
+
+        } catch (SQLException e) {
+            System.out.println("Error while fetching company: " + e.getMessage());
+        }
+        return false;
+    }
 }

@@ -125,4 +125,33 @@ public class ResidentDAO {
         }
         return residents;
     }
+
+    public Resident getResidentById(int residentId) throws SQLException {
+        Resident resident = null;
+
+        // SQL query to fetch resident by ID
+        String sql = "SELECT * FROM residents WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, residentId);
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
+
+            // Check if we have a result
+            if (rs.next()) {
+                // Create a Resident object from the result set
+                resident = new Resident(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("age"),
+                        rs.getBoolean("uses_elevator"),
+                        rs.getBoolean("has_pet"),
+                        rs.getInt("apartment_id")
+                );
+            }
+        }
+
+        return resident; // Returns null if no resident is found
+    }
 }

@@ -2,6 +2,7 @@ package service;
 
 import dao.BuildingDAO;
 import pojo.Building;
+import pojo.Employee;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,7 +16,13 @@ public class BuildingService {
     public void addBuilding(String address, int floors, int apartments, double totalArea, double sharedArea) {
         try {
             // Update the call to match the new constructor with the 'sharedArea' parameter
-            buildingDAO.createBuilding(address, floors, apartments, totalArea, sharedArea);
+            int newBuildingId = buildingDAO.createBuilding(address, floors, apartments, totalArea, sharedArea);
+
+            // Assign the building to employee
+            EmployeeService employeeService = new EmployeeService();
+            Employee leastLoadedEmployee = employeeService.getEmployeeWithLeastBuildings(-1);
+            employeeService.assignBuildingToEmployee(leastLoadedEmployee.getId(), newBuildingId);
+
             System.out.println("Building added successfully!");
         } catch (SQLException e) {
             System.err.println("Error adding building: " + e.getMessage());
@@ -53,5 +60,15 @@ public class BuildingService {
         } catch (SQLException e) {
             System.err.println("Error retrieving buildings: " + e.getMessage());
         }
+    }
+
+    public boolean isBuildingExist(int buildingId) {
+        // Check if the building with the given ID exists
+        try {
+            return buildingDAO.getBuildingById(buildingId) != null;
+        } catch (SQLException e) {
+            System.out.println("Error while fetching building: " + e.getMessage());
+        }
+        return false;
     }
 }

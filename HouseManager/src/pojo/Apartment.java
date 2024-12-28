@@ -5,7 +5,6 @@ public class Apartment {
     private int number;
     private int floor;
     private double area;
-
     private int buildingId; // Reference to the building this apartment belongs to
 
     public Apartment(int id, int number, int floor, double area, int buildingId) {

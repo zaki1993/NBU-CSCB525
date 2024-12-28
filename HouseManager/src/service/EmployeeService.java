@@ -34,8 +34,11 @@ public class EmployeeService {
 
     public void deleteEmployee(int employeeId) {
         try {
+            Employee e = employeeDAO.getEmployeeById(employeeId);
             employeeDAO.deleteEmployee(employeeId);
-            System.out.println("Employee deleted successfully!");
+            // Assign the building to new employee
+            reassignBuildingsFromEmployee(e);
+            System.out.println("Employee terminated and buildings reassigned.");
         } catch (SQLException e) {
             System.err.println(String.format("Error deleting employee with id %d: ", employeeId) + e.getMessage());
         }
@@ -86,5 +89,45 @@ public class EmployeeService {
         } else {
             employees.forEach(System.out::println);
         }
+    }
+    public boolean isEmployeeExist(int employeeId) {
+        // Check if the employee with the given ID exists
+        try {
+            return employeeDAO.getEmployeeById(employeeId) != null;
+        } catch (SQLException e) {
+            System.out.println("Error while fetching employee: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public void reassignBuildingsFromEmployee(Employee departingEmployee) {
+        for (Building building : departingEmployee.getAssignedBuildings()) {
+            // Find the employee with the least buildings
+            Employee newEmployee = getEmployeeWithLeastBuildings(departingEmployee.getId());
+            // Remove the building from the employee
+            unassignBuildingToEmployee(building.getId());
+            // Assign the building to the new employee
+            if (newEmployee != null) {
+                assignBuildingToEmployee(newEmployee.getId(), building.getId());
+            }
+        }
+        System.out.println("Buildings reassigned from employee: " + departingEmployee.getName());
+    }
+
+    /**
+     * Find the employee with least building excluding the employee which is departing.
+     * @param excludeEmployee
+     * @return
+     */
+    public Employee getEmployeeWithLeastBuildings(int excludeEmployee) {
+        try {
+            return employeeDAO.listEmployees().stream()
+                              .filter(e -> e.getId() != excludeEmployee) // exclude the departing employee
+                              .min(Comparator.comparingInt(e -> e.getAssignedBuildings().size()))
+                              .orElseThrow(() -> new IllegalStateException("No employees available."));
+        } catch (SQLException e) {
+            System.err.println("Error retrieving employees: " + e.getMessage());
+        }
+        return null;
     }
 }

@@ -53,4 +53,14 @@ public class ApartmentService {
             System.err.println("Error listing apartments: " + e.getMessage());
         }
     }
+
+    public boolean isApartmentExist(int apartmentId) {
+        // Check if the apartment with the given ID exists
+        try {
+            return apartmentDAO.getApartmentById(apartmentId) != null;
+        } catch (SQLException e) {
+            System.out.println("Error while fetching apartment: " + e.getMessage());
+        }
+        return false;
+    }
 }

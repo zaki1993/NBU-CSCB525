@@ -71,4 +71,15 @@ public class ResidentService {
             System.out.println("Error while fetching residents: " + ex.getMessage());
         }
     }
+
+    public boolean isResidentExist(int residentId) {
+        // Check if the resident with the given ID exists
+        try {
+            return residentDAO.getResidentById(residentId) != null;
+        } catch (SQLException e) {
+            System.out.println("Error while fetching resident: " + e.getMessage());
+        }
+        return false;
+    }
+
 }

@@ -91,4 +91,22 @@ public class ApartmentDAO {
         return apartments;
     }
 
+    public Apartment getApartmentById(int apartmentId) throws SQLException {
+        String sql = "SELECT * FROM apartments WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, apartmentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Apartment(
+                            rs.getInt("id"),
+                            rs.getInt("number"),
+                            rs.getInt("floor"),
+                            rs.getDouble("area"),
+                            rs.getInt("building_id")
+                    );
+                }
+            }
+        }
+        return null; // Return null if no apartment found
+    }
 }

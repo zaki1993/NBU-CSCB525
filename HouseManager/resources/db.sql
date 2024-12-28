@@ -70,3 +70,11 @@ CREATE TABLE payments (
     FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
+
+CREATE TABLE fee_configurations (
+    id SERIAL PRIMARY KEY,
+    base_fee_per_sq_meter DECIMAL(10, 2) NOT NULL,  -- Base fee per square meter
+    elevator_fee_per_person DECIMAL(10, 2) NOT NULL, -- Fee per person using elevator
+    pet_fee DECIMAL(10, 2) NOT NULL,                -- Fee for each pet in the apartment
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Timestamp for record creation
+);

@@ -6,6 +6,7 @@ import utils.DatabaseConfig;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PaymentDAO {
@@ -128,5 +129,30 @@ public class PaymentDAO {
                 return payments;
             }
         }
+    }
+
+    public List<Payment> getPaymentsForFee(int feeId) throws SQLException {
+        String query = "SELECT * FROM payments WHERE fee_id = ?";
+        List<Payment> payments = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, feeId);
+
+            // Execute the query
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Payment payment = new Payment(
+                            rs.getInt("id"),
+                            rs.getDouble("amount"),
+                            rs.getDate("payment_date"),
+                            rs.getInt("fee_id"),
+                            rs.getInt("employee_id"),
+                            rs.getInt("company_id")
+                    );
+                    payments.add(payment);
+                }
+            }
+        }
+        return payments;
     }
 }

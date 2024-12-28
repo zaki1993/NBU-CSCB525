@@ -71,4 +71,32 @@ public class CompanyDAO {
         }
         return count;
     }
+
+    public Company getCompanyById(int companyId) throws SQLException {
+        Company company = null;
+
+        // SQL query to fetch company by ID
+        String sql = "SELECT * FROM companies WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, companyId);
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
+
+            // Check if we have a result
+            if (rs.next()) {
+                // Create a Company object from the result set
+                company = new Company(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone")
+                );
+            }
+
+        }
+
+        return company; // Returns null if no company is found
+    }
 }

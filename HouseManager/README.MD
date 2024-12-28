@@ -96,6 +96,15 @@ The **Electronic Property Manager** is a Java-based application designed to stre
     - `employee_id` (Foreign Key): References `employees(id)`.
     - `company_id` (Foreign Key): References `companies(id)`.
 
+### 8. `fee_configurations`
+**Description**: Tracks base fees.
+- **Columns**:
+  - `id` (Primary Key)
+  - `base_fee_per_sq_meter`: Fee per sq meter.
+  - `elevator_fee_per_person`: Elevator fee.
+  - `pet_fee` (Foreign Key): Pet fee.
+  - `created_at` (Foreign Key): Created at.
+
 ---
 
 ## Application Workflow and Usage
@@ -274,4 +283,13 @@ CREATE TABLE payments (
     FOREIGN KEY (fee_id) REFERENCES fees(id) ON DELETE CASCADE,
     FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Fee configurations  table
+CREATE TABLE fee_configurations (
+    id SERIAL PRIMARY KEY,
+    base_fee_per_sq_meter DECIMAL(10, 2) NOT NULL,  -- Base fee per square meter
+    elevator_fee_per_person DECIMAL(10, 2) NOT NULL, -- Fee per person using elevator
+    pet_fee DECIMAL(10, 2) NOT NULL,                -- Fee for each pet in the apartment
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Timestamp for record creation
 );

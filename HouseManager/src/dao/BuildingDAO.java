@@ -17,16 +17,21 @@ public class BuildingDAO {
     /**
      * Create a new building record.
      */
-    public void createBuilding(String address, int floors, int apartments, double totalArea, double sharedArea) throws SQLException {
-        String query = "INSERT INTO buildings (address, floors, number_of_apartments, total_area, shared_area) VALUES (?, ?, ?, ?, ?)";
+    public int createBuilding(String address, int floors, int apartments, double totalArea, double sharedArea) throws SQLException {
+        String query = "INSERT INTO buildings (address, floors, number_of_apartments, total_area, shared_area) VALUES (?, ?, ?, ?, ?) RETURNING id";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, address);
             stmt.setInt(2, floors);
             stmt.setInt(3, apartments);
             stmt.setDouble(4, totalArea);
             stmt.setDouble(5, sharedArea);
-            stmt.executeUpdate();
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id"); // Return the ID of the newly inserted row
+            }
         }
+        return -1;
     }
 
     /**

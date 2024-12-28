@@ -1,12 +1,14 @@
 package service;
 
+import dao.ApartmentDAO;
 import dao.FeeDAO;
 import dao.PaymentDAO;
+import pojo.Apartment;
 import pojo.Fee;
+import pojo.FeeConfigurations;
 import pojo.Payment;
 
-import java.sql.Date;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class FeeService {
@@ -16,30 +18,34 @@ public class FeeService {
         feeDAO = new FeeDAO();
     }
 
-    public void addFee(double amount, Date dueDate, int apartmentId) {
+    public void createBaseFee(double baseFeePerSqMeter, double elevatorFeePerPerson, double petFee) {
         try {
-            feeDAO.addFee(amount, dueDate, apartmentId);
-            System.out.println("Fee added successfully.");
+            feeDAO.createBaseFee(baseFeePerSqMeter, elevatorFeePerPerson, petFee);
+            System.out.println("Base fees added successfully.");
         } catch (SQLException e) {
-            System.err.println("Error adding fee: " + e.getMessage());
+            System.err.println("Error adding base fees: " + e.getMessage());
         }
     }
 
-    public void editFee(int feeId, double amount, Date dueDate) {
+    public void editBaseFee(double baseFeePerSqMeter, double elevatorFeePerPerson, double petFee) {
         try {
-            feeDAO.editFee(feeId, amount, dueDate);
-            System.out.println("Fee updated successfully.");
+            feeDAO.editBaseFee(baseFeePerSqMeter, elevatorFeePerPerson, petFee);
+            System.out.println("Base fees updated successfully.");
         } catch (SQLException e) {
-            System.err.println("Error updating fee: " + e.getMessage());
+            System.err.println("Error updating base fees: " + e.getMessage());
         }
     }
 
-    public void deleteFee(int feeId) {
+    public void listBaseFee() {
         try {
-            feeDAO.deleteFee(feeId);
-            System.out.println("Fee deleted successfully.");
+            FeeConfigurations feeConfigurations = feeDAO.listBaseFee();
+            if (feeConfigurations != null) {
+                System.out.println("Base fees: " + feeConfigurations);
+            } else {
+                System.out.println("No base fees configured");
+            }
         } catch (SQLException e) {
-            System.err.println("Error deleting fee: " + e.getMessage());
+            System.err.println("Error listing base fees: " + e.getMessage());
         }
     }
 
@@ -69,6 +75,42 @@ public class FeeService {
             for (Fee fee : fees) {
                 System.out.println(fee);
             }
+        }
+    }
+
+    public boolean isFeeExist(int feeId) {
+        // Check if the fee with the given ID exists
+        try {
+            return feeDAO.getFeeById(feeId) != null;
+        } catch (SQLException e) {
+            System.out.println("Error while fetching fee: " + e.getMessage());
+        }
+        return false;
+    }
+    public void collectFeesForBuilding(int buildingId, Date dueDate) {
+        try {
+            ApartmentDAO apartmentDAO = new ApartmentDAO();
+            List<Apartment> apartments = apartmentDAO.getApartmentsByBuilding(buildingId);
+            if (apartments != null && !apartments.isEmpty()) {
+                for (Apartment a : apartments) {
+                    if (!feeDAO.isFeeCollectedForMonth(a.getId(), dueDate)) {
+                        // Calculate the maintenance fee for the apartment
+                        double fee = feeDAO.calculateBuildingMaintenanceFee(a.getId());
+
+                        // Save the fee
+                        feeDAO.addFeeForApartment(fee, dueDate, a.getId());
+
+                        // Log the fee
+                        System.out.println("Apartment ID: " + a.getId() + ", Fee: " + fee);
+                    } else {
+                        System.out.println("Apartment ID: " + a.getId() + " already collected the fee!");
+                    }
+                }
+            } else {
+                System.out.println("No apartments found in this building!");
+            }
+        } catch (SQLException e) {
+            System.out.println("Collection of fees failed: " + e.getMessage());
         }
     }
 }
